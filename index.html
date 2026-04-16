@@ -236,6 +236,41 @@
             margin-bottom: 12px;
         }
         
+
+        /* 题库选择器 */
+        .bank-selector {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .bank-selector label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .bank-selector select {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--card-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .bank-selector select:focus {
+            border-color: var(--primary-color);
+        }
+        
         /* 统计卡片 */
         .stats-grid {
             display: grid;
@@ -725,6 +760,15 @@
             </div>
         </div>
         <div class="main-content">
+            <!-- 题库选择 -->
+            <div class="bank-selector">
+                <label>选择题库：</label>
+                <select id="bankSelect" onchange="changeBank(this.value)">
+                    <option value="all">题库1+2（全部700题）</option>
+                    <option value="tiku2">题库2（科创板100题）</option>
+                </select>
+            </div>
+            
             <!-- 统计概览 -->
             <div class="stats-grid">
                 <div class="stat-card">
@@ -1059,6 +1103,7 @@
             currentUser: null,
             questions: [],
             knowledgePoints: [],
+            currentBank: 'all', // 'all' 或 'tiku2' 
             
             // 考试状态
             timedExam: {
@@ -1178,17 +1223,35 @@
             document.getElementById('wrongCount').textContent = wrongQuestions.length;
         }
         
+        // ==================== 题库选择 ====================
+        function changeBank(bankType) {
+            AppState.currentBank = bankType;
+            localStorage.setItem('selected_bank', bankType);
+            updateHomeStats();
+            showToast(bankType === 'all' ? '已切换到全部题库（700题）' : '已切换到科创板题库（100题）');
+        }
+        
+        function getFilteredQuestions() {
+            if (AppState.currentBank === 'tiku2') {
+                return AppState.questions.filter(q => q.source === '科创板题库');
+            }
+            return AppState.questions;
+        }
+        
         // ==================== 计时考试 ====================
         function startTimedExam() {
+            // 获取当前选择的题库
+            const filteredQuestions = getFilteredQuestions();
+            
             // 检查题库
-            if (!AppState.questions || AppState.questions.length === 0) {
+            if (!filteredQuestions || filteredQuestions.length === 0) {
                 showToast('题库未加载，请刷新页面重试');
                 console.error('题库为空，无法开始考试');
                 return;
             }
             
             // 随机选择20题
-            const allQuestions = [...AppState.questions];
+            const allQuestions = [...filteredQuestions];
             const selectedQuestions = [];
             for (let i = 0; i < 20 && allQuestions.length > 0; i++) {
                 const index = Math.floor(Math.random() * allQuestions.length);
@@ -1377,8 +1440,11 @@
         
         // ==================== 自由考试 ====================
         function startFreeExam() {
+            // 获取当前选择的题库
+            const filteredQuestions = getFilteredQuestions();
+            
             // 检查题库
-            if (!AppState.questions || AppState.questions.length === 0) {
+            if (!filteredQuestions || filteredQuestions.length === 0) {
                 showToast('题库未加载，请刷新页面重试');
                 console.error('题库为空，无法开始考试');
                 return;
@@ -1389,8 +1455,9 @@
         }
         
         function nextFreeQuestion() {
-            const index = Math.floor(Math.random() * AppState.questions.length);
-            AppState.freeExam.currentQuestion = AppState.questions[index];
+            const filteredQuestions = getFilteredQuestions();
+            const index = Math.floor(Math.random() * filteredQuestions.length);
+            AppState.freeExam.currentQuestion = filteredQuestions[index];
             AppState.freeExam.answered = false;
             
             document.getElementById('freeNextBtn').style.display = 'none';
@@ -2000,6 +2067,15 @@ D. ${question.options.D}
                 alert('题库加载失败，请刷新页面重试');
                 return;
             }
+            
+            // 恢复题库选择
+            const savedBank = localStorage.getItem('selected_bank') || 'all';
+            AppState.currentBank = savedBank;
+            const bankSelect = document.getElementById('bankSelect');
+            if (bankSelect) {
+                bankSelect.value = savedBank;
+            }
+            console.log('题库选择:', savedBank);
             
             // 更新首页统计
             updateHomeStats();

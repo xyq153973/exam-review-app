@@ -974,6 +974,26 @@
             </div>
             
             <div class="result-card" style="margin-top: 20px;">
+                <h3 style="margin-bottom: 16px;">AI解析设置</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 14px;">
+                    配置百度千帆API Key后，可使用AI错题解析功能。
+                </p>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-secondary);">
+                        百度千帆 API Key
+                    </label>
+                    <input type="text" id="apiKeyInput" placeholder="请输入您的API Key" 
+                           style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px;">
+                </div>
+                <button class="btn btn-primary" onclick="saveApiKey()" style="width: 100%;">
+                    保存API Key
+                </button>
+                <p style="color: var(--error-color); font-size: 12px; margin-top: 12px;">
+                    注意：请勿将您的API Key分享给他人，API Key仅存储在本地浏览器中。
+                </p>
+            </div>
+            
+            <div class="result-card" style="margin-top: 20px;">
                 <h3 style="margin-bottom: 16px;">使用说明</h3>
                 <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
                     <p><strong>自动同步：</strong>每次操作后数据会自动同步到云端，无需手动操作。</p>
@@ -1574,9 +1594,14 @@
         }
         
         async function callBaiduAI(question) {
-            // 百度千帆API配置
-            const API_KEY = 'bce-v3/ALTAK-uxwRHNq3jIUSktdmIKRy4/a85dc506ff310149ad4111f48f7c5b4038ca6c44';
+            // 百度千帆API配置 - 请在设置中配置您自己的API Key
+            // 注意：请勿将API Key提交到公开仓库！
+            const API_KEY = localStorage.getItem('baidu_api_key') || '';
             const API_URL = 'https://qianfan.baidubce.com/v2/app/conversation/runs';
+            
+            if (!API_KEY) {
+                throw new Error('请先在数据管理中配置百度AI API Key');
+            }
             
             const prompt = `你是一位专业的证券从业资格考试辅导老师。请为以下错题提供详细的解析和记忆技巧。
 
@@ -1804,6 +1829,36 @@ D. ${question.options.D}
             showPage('dataManagePage');
             updateDataManageStats();
             updateCloudStatus();
+            loadApiKey();
+        }
+        
+        function loadApiKey() {
+            const savedKey = localStorage.getItem('baidu_api_key') || '';
+            const input = document.getElementById('apiKeyInput');
+            if (input && savedKey) {
+                input.value = savedKey.substring(0, 10) + '****（已保存）';
+                input.type = 'text';
+                input.disabled = true;
+            }
+        }
+        
+        function saveApiKey() {
+            const input = document.getElementById('apiKeyInput');
+            const key = input.value.trim();
+            
+            if (!key) {
+                showToast('请输入API Key');
+                return;
+            }
+            
+            if (key.includes('****')) {
+                showToast('API Key已保存');
+                return;
+            }
+            
+            localStorage.setItem('baidu_api_key', key);
+            showToast('API Key已保存');
+            loadApiKey();
         }
         
         function updateCloudStatus() {

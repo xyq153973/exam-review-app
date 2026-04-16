@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>辅导验收考试复习系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary-color: #1a73e8;
+            --primary-dark: #1557b0;
+            --primary-light: #e8f0fe;
+            --success-color: #34a853;
+            --error-color: #ea4335;
+            --warning-color: #fbbc04;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border-color: #dadce0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        /* 页面容器 */
+        .page {
+            display: none;
+            min-height: 100vh;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* 头部导航 */
+        .header {
+            background: var(--primary-color);
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 20px;
+            font-weight: 500;
+        }
+        
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .header-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* 登录页面 */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+        }
+        
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 400px;
+            margin: 20px;
+        }
+        
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+        
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .btn-error {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .login-switch {
+            text-align: center;
+            margin-top: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .login-switch a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        /* 主页卡片 */
+        .home-cards {
+            display: grid;
+            gap: 16px;
+            margin-top: 20px;
+        }
+        
+        .home-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .home-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .home-card h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+        
+        .home-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .home-card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+        
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        /* 考试页面 */
+        .exam-header {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .timer {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .timer.warning {
+            color: var(--warning-color);
+        }
+        
+        .timer.danger {
+            color: var(--error-color);
+        }
+        
+        .progress-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        /* 题目卡片 */
+        .question-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .question-number {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .question-content {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        
+        .question-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        /* 选项 */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .option-item:hover {
+            border-color: var(--primary-light);
+            background: var(--primary-light);
+        }
+        
+        .option-item.selected {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+        }
+        
+        .option-item.correct {
+            border-color: var(--success-color);
+            background: #e6f4ea;
+        }
+        
+        .option-item.wrong {
+            border-color: var(--error-color);
+            background: #fce8e6;
+        }
+        
+        .option-label {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            margin-right: 12px;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+        
+        .option-item.selected .option-label {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .option-item.correct .option-label {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .option-item.wrong .option-label {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .option-text {
+            flex: 1;
+            line-height: 1.6;
+        }
+        
+        /* 按钮 */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-group .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        /* 结果页面 */
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .result-score {
+            font-size: 64px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        
+        .result-score.pass {
+            color: var(--success-color);
+        }
+        
+        .result-score.fail {
+            color: var(--error-color);
+        }
+        
+        .result-message {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        
+        /* 错题列表 */
+        .wrong-questions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .wrong-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .wrong-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .wrong-item-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        
+        /* AI解析 */
+        .ai-analysis {
+            background: var(--primary-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+        
+        .ai-analysis-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .ai-analysis-content {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-primary);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--primary-light);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 知识点筛选 */
+        .filter-section {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .filter-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-tag {
+            padding: 6px 12px;
+            border-radius: 16px;
+            background: var(--bg-color);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-tag:hover {
+            background: var(--primary-light);
+        }
+        
+        .filter-tag.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        /* 图表容器 */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        .chart-placeholder {
+            height: 200px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+        }
+        
+        /* 历史记录 */
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .history-item {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-info {
+            flex: 1;
+        }
+        
+        .history-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .history-score {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        /* 收藏夹 */
+        .favorite-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .favorite-btn.active {
+            color: var(--warning-color);
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+        
+        /* Toast提示 */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--text-primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            z-index: 300;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .exam-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn-group .btn {
+                width: 100%;
+            }
+            
+            .header h1 {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 主页 -->
+    <div id="homePage" class="page active">
+        <div class="header">
+            <div class="header-content">
+                <h1>辅导验收考试复习系统</h1>
+            </div>
+        </div>
+        <div class="main-content">
+            <!-- 统计概览 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuestions">0</div>
+                    <div class="stat-label">总答题数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="correctRate">0%</div>
+                    <div class="stat-label">正确率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="examCount">0</div>
+                    <div class="stat-label">考试次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wrongCount">0</div>
+                    <div class="stat-label">错题数</div>
+                </div>
+            </div>
+            
+            <!-- 功能入口 -->
+            <div class="home-cards">
+                <div class="home-card" onclick="startTimedExam()">
+                    <div class="home-card-icon">⏱️</div>
+                    <h3>计时仿真考试</h3>
+                    <p>20题/60分钟，模拟真实考试环境，交卷后显示成绩和错题</p>
+                </div>
+                <div class="home-card" onclick="startFreeExam()">
+                    <div class="home-card-icon">📝</div>
+                    <h3>自由随机考试</h3>
+                    <p>随机出题，无时间限制，即时显示对错</p>
+                </div>
+                <div class="home-card" onclick="showWrongQuestions()">
+                    <div class="home-card-icon">❌</div>
+                    <h3>错题集</h3>
+                    <p>查看错题、AI解析、反复练习</p>
+                </div>
+                <div class="home-card" onclick="showFavorites()">
+                    <div class="home-card-icon">⭐</div>
+                    <h3>收藏夹</h3>
+                    <p>查看收藏的题目</p>
+                </div>
+                <div class="home-card" onclick="showStats()">
+                    <div class="home-card-icon">📊</div>
+                    <h3>学习统计</h3>
+                    <p>查看学习进度和正确率趋势</p>
+                </div>
+                <div class="home-card" onclick="showDataManage()">
+                    <div class="home-card-icon">💾</div>
+                    <h3>数据管理</h3>
+                    <p>导出/导入数据，备份到网盘</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 计时考试页面 -->
+    <div id="timedExamPage" class="page">
+        <div class="header">
+            <div class="header-content">
+                <h1>计时仿真考试</h1>
+                <button class="header-btn" onclick="confirmExit()">退出考试</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="exam-header">
+                <div class="timer" id="examTimer">60:00</div>
+                <div class="progress-info">
+                    <span id="currentProgress">第 1 题 / 共 20 题</span>
+                </div>
+            </div>
+            <div id="timedQuestionContainer"></div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()" disabled>上一题</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">下一题</button>
+                <button class="btn btn-success" id="submitBtn" onclick="submitExam()" style="display: none;">交卷</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自由考试页面 -->
+    <div id="freeExamPage" class="page">
+        <div class="header">
+            <div class="header-content">
+                <h1>自由随机考试</h1>
+                <button class="header-btn" onclick="showPage('homePage')">返回主页</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div id="freeQuestionContainer"></div>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="showPage('homePage')">结束练习</button>
+                <button class="btn btn-primary" id="freeNextBtn" onclick="nextFreeQuestion()" style="display: none;">下一题</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 考试结果页面 -->
+    <div id="resultPage" class="page">
+        <div class="header">
+            <div class="header-content">
+                <h1>考试结果</h1>
+                <button class="header-btn" onclick="showPage('homePage')">返回主页</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="result-card">
+                <div class="result-score" id="resultScore">0</div>
+                <div class="result-message" id="resultMessage">正在计算...</div>
+                <div id="resultDetails"></div>
+                <div class="btn-group" style="justify-content: center;">
+                    <button class="btn btn-primary" onclick="startTimedExam()">再考一次</button>
+                    <button class="btn btn-secondary" onclick="showWrongQuestions()">查看错题</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 错题集页面 -->
+    <div id="wrongQuestionsPage" class="page">
+        <div class="header">
+            <div class="header-content">
+                <h1>错题集</h1>
+                <button class="header-btn" onclick="showPage('homePage')">返回主页</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="filter-section">
+                <div class="filter-title">按知识点筛选</div>
+                <div class="filter-tags" id="knowledgeFilter"></div>
+            </div>
+            <div id="wrongQuestionsList" class="wrong-questions-list"></div>
+        </div>
+    </div>
+
+    <!-- 收藏夹页面 -->
+    <div id="favoritesPage" class="page">
+        <div class="header">
+            <div class="header-content">
+                <h1>收藏夹</h1>
+                <button class="header-btn" onclick="showPage('homePage')">返回主页</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div id="favoritesList" class="wrong-questions-list"></div>
+        </div>
+    </div>
+
+    <!-- 统计页面 -->
+    <div id="statsPage" class="page">
+        <div class="header">
+            <div class="header-content">
+                <h1>学习统计</h1>
+                <button class="header-btn" onclick="showPage('homePage')">返回主页</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="statsTotal">0</div>
+                    <div class="stat-label">总答题数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsCorrect">0%</div>
+                    <div class="stat-label">正确率</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsExams">0</div>
+                    <div class="stat-label">考试次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statsPassRate">0%</div>
+                    <div class="stat-label">通过率</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">正确率趋势</div>
+                <div id="trendChart" class="chart-placeholder">暂无数据</div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">知识点掌握度</div>
+                <div id="knowledgeChart" class="chart-placeholder">暂无数据</div>
+            </div>
+            
+            <div class="chart-container">
+                <div class="chart-title">历史考试记录</div>
+                <div id="historyList" class="history-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据管理页面 -->
+    <div id="dataManagePage" class="page">
+        <div class="header">
+            <div class="header-content">
+                <h1>数据管理</h1>
+                <button class="header-btn" onclick="showPage('homePage')">返回主页</button>
+            </div>
+        </div>
+        <div class="main-content">
+            <div class="result-card">
+                <h3 style="margin-bottom: 20px;">云端数据同步</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                    数据自动同步到Supabase云端，登录同一账号即可在所有设备间同步学习进度。
+                </p>
+                
+                <div style="background: var(--bg-color); border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span>云端状态</span>
+                        <span id="cloudStatus" style="color: var(--success-color);">已连接</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span>学习统计</span>
+                        <span id="dataStats">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span>错题数量</span>
+                        <span id="dataWrong">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <span>收藏数量</span>
+                        <span id="dataFavorites">-</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>考试记录</span>
+                        <span id="dataHistory">-</span>
+                    </div>
+                </div>
+                
+                <div class="btn-group" style="flex-direction: column;">
+                    <button class="btn btn-primary" onclick="manualSync()">
+                        立即同步到云端
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        导出数据到文件
+                    </button>
+                    <label class="btn btn-secondary" style="text-align: center; cursor: pointer;">
+                        从文件导入数据
+                        <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+                    </label>
+                    <button class="btn btn-error" onclick="confirmClearData()">
+                        清除所有数据
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-card" style="margin-top: 20px;">
+                <h3 style="margin-bottom: 16px;">使用说明</h3>
+                <div style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+                    <p><strong>自动同步：</strong>每次操作后数据会自动同步到云端，无需手动操作。</p>
+                    <p><strong>跨设备使用：</strong>在其他设备上登录同一账号，数据会自动同步。</p>
+                    <p><strong>手动备份：</strong>点击「导出数据到文件」可下载JSON备份文件。</p>
+                    <p><strong>注意事项：</strong>导入数据会覆盖当前数据，请谨慎操作。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast提示 -->
+    <div id="toast" class="toast"></div>
+
+    <!-- 确认退出模态框 -->
+    <div id="exitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>确认退出</h3>
+                <button class="modal-close" onclick="closeModal('exitModal')">&times;</button>
+            </div>
+            <p>确定要退出考试吗？当前进度将不会保存。</p>
+            <div class="btn-group">
+                <button class="btn btn-secondary" onclick="closeModal('exitModal')">取消</button>
+                <button class="btn btn-error" onclick="exitExam()">确认退出</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 题库数据将通过外部JS加载 -->
+    <script src="questions.js" onerror="console.error('题库加载失败')"></script>
+    
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="console.error('Supabase SDK加载失败')"></script>
+    
+    <script>
+        // 全局错误处理
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('JavaScript错误:', msg, 'at', url, line, col);
+            alert('发生错误: ' + msg + '\n请查看控制台获取详细信息');
+            return false;
+        };
+        
+        // ==================== Supabase配置 ====================
+        const SUPABASE_URL = 'https://balbwhvwhdfbuwasbyyp.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_WgxSTzP7iDrM5Eg-t6MJ2Q_rLCWz..';
+        
+        // 初始化Supabase客户端
+        let supabase = null;
+        try {
+            if (window.supabase) {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                console.log('Supabase初始化成功');
+            } else {
+                console.warn('Supabase SDK未加载，云端同步功能不可用');
+            }
+        } catch (e) {
+            console.error('Supabase初始化失败:', e);
+        }
+        
+        // ==================== 应用状态 ====================
+        const AppState = {
+            currentUser: null,
+            questions: [],
+            knowledgePoints: [],
+            
+            // 考试状态
+            timedExam: {
+                questions: [],
+                currentIndex: 0,
+                answers: {},
+                startTime: null,
+                timer: null,
+                timeLeft: 3600 // 60分钟
+            },
+            
+            freeExam: {
+                currentQuestion: null,
+                answered: false
+            }
+        };
+        
+        // ==================== 存储（本地+云端） ====================
+        const Storage = {
+            getKey(key) {
+                return `exam_app_${AppState.currentUser?.username || 'guest'}_${key}`;
+            },
+            
+            get(key) {
+                const data = localStorage.getItem(this.getKey(key));
+                return data ? JSON.parse(data) : null;
+            },
+            
+            set(key, value) {
+                localStorage.setItem(this.getKey(key), JSON.stringify(value));
+                // 异步同步到云端
+                this.syncToCloud(key, value);
+            },
+            
+            getUsers() {
+                return JSON.parse(localStorage.getItem('exam_app_users') || '{}');
+            },
+            
+            saveUser(username, password) {
+                const users = this.getUsers();
+                users[username] = { password };
+                localStorage.setItem('exam_app_users', JSON.stringify(users));
+            },
+            
+            // 同步数据到云端
+            async syncToCloud(key, value) {
+                if (!supabase || !AppState.currentUser) return;
+                
+                try {
+                    const { error } = await supabase
+                        .from('user_data')
+                        .upsert({
+                            username: AppState.currentUser.username,
+                            data_type: key,
+                            data_content: value,
+                            updated_at: new Date().toISOString()
+                        }, {
+                            onConflict: 'username,data_type'
+                        });
+                    
+                    if (error) {
+                        console.error('云端同步失败:', error);
+                    } else {
+                        console.log('云端同步成功:', key);
+                    }
+                } catch (e) {
+                    console.error('云端同步异常:', e);
+                }
+            },
+            
+            // 从云端获取数据
+            async syncFromCloud() {
+                if (!supabase || !AppState.currentUser) return;
+                
+                try {
+                    const { data, error } = await supabase
+                        .from('user_data')
+                        .select('*')
+                        .eq('username', AppState.currentUser.username);
+                    
+                    if (error) {
+                        console.error('云端获取失败:', error);
+                        return;
+                    }
+                    
+                    if (data && data.length > 0) {
+                        data.forEach(item => {
+                            localStorage.setItem(
+                                this.getKey(item.data_type),
+                                JSON.stringify(item.data_content)
+                            );
+                        });
+                        console.log('云端数据已同步到本地');
+                    }
+                } catch (e) {
+                    console.error('云端获取异常:', e);
+                }
+            }
+        };
+        
+        // ==================== 页面导航 ====================
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+        }
+        
+        // ==================== 主页统计 ====================
+        function updateHomeStats() {
+            const stats = Storage.get('stats') || { total: 0, correct: 0, exams: 0 };
+            const wrongQuestions = Storage.get('wrongQuestions') || [];
+            
+            document.getElementById('totalQuestions').textContent = stats.total;
+            document.getElementById('correctRate').textContent = stats.total > 0 
+                ? Math.round(stats.correct / stats.total * 100) + '%' 
+                : '0%';
+            document.getElementById('examCount').textContent = stats.exams;
+            document.getElementById('wrongCount').textContent = wrongQuestions.length;
+        }
+        
+        // ==================== 计时考试 ====================
+        function startTimedExam() {
+            // 检查题库
+            if (!AppState.questions || AppState.questions.length === 0) {
+                showToast('题库未加载，请刷新页面重试');
+                console.error('题库为空，无法开始考试');
+                return;
+            }
+            
+            // 随机选择20题
+            const allQuestions = [...AppState.questions];
+            const selectedQuestions = [];
+            for (let i = 0; i < 20 && allQuestions.length > 0; i++) {
+                const index = Math.floor(Math.random() * allQuestions.length);
+                selectedQuestions.push(allQuestions.splice(index, 1)[0]);
+            }
+            
+            AppState.timedExam = {
+                questions: selectedQuestions,
+                currentIndex: 0,
+                answers: {},
+                startTime: Date.now(),
+                timer: null,
+                timeLeft: 3600
+            };
+            
+            showPage('timedExamPage');
+            renderTimedQuestion();
+            startTimer();
+        }
+        
+        function startTimer() {
+            AppState.timedExam.timer = setInterval(() => {
+                AppState.timedExam.timeLeft--;
+                updateTimerDisplay();
+                
+                if (AppState.timedExam.timeLeft <= 0) {
+                    clearInterval(AppState.timedExam.timer);
+                    submitExam();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(AppState.timedExam.timeLeft / 60);
+            const seconds = AppState.timedExam.timeLeft % 60;
+            const timerEl = document.getElementById('examTimer');
+            timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            timerEl.classList.remove('warning', 'danger');
+            if (AppState.timedExam.timeLeft <= 300) {
+                timerEl.classList.add('danger');
+            } else if (AppState.timedExam.timeLeft <= 600) {
+                timerEl.classList.add('warning');
+            }
+        }
+        
+        function renderTimedQuestion() {
+            const exam = AppState.timedExam;
+            const question = exam.questions[exam.currentIndex];
+            const container = document.getElementById('timedQuestionContainer');
+            
+            document.getElementById('currentProgress').textContent = 
+                `第 ${exam.currentIndex + 1} 题 / 共 ${exam.questions.length} 题`;
+            
+            const selectedAnswer = exam.answers[question.id];
+            
+            container.innerHTML = `
+                <div class="question-card">
+                    <span class="question-number">第 ${exam.currentIndex + 1} 题</span>
+                    <div class="question-content">${question.content}</div>
+                    <div class="options-list">
+                        ${Object.entries(question.options).map(([key, value]) => `
+                            <div class="option-item ${selectedAnswer === key ? 'selected' : ''}" 
+                                 onclick="selectAnswer('${key}')">
+                                <span class="option-label">${key}</span>
+                                <span class="option-text">${value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            // 更新按钮状态
+            document.getElementById('prevBtn').disabled = exam.currentIndex === 0;
+            
+            if (exam.currentIndex === exam.questions.length - 1) {
+                document.getElementById('nextBtn').style.display = 'none';
+                document.getElementById('submitBtn').style.display = 'inline-block';
+            } else {
+                document.getElementById('nextBtn').style.display = 'inline-block';
+                document.getElementById('submitBtn').style.display = 'none';
+            }
+        }
+        
+        function selectAnswer(answer) {
+            const exam = AppState.timedExam;
+            const question = exam.questions[exam.currentIndex];
+            exam.answers[question.id] = answer;
+            renderTimedQuestion();
+        }
+        
+        function prevQuestion() {
+            if (AppState.timedExam.currentIndex > 0) {
+                AppState.timedExam.currentIndex--;
+                renderTimedQuestion();
+            }
+        }
+        
+        function nextQuestion() {
+            if (AppState.timedExam.currentIndex < AppState.timedExam.questions.length - 1) {
+                AppState.timedExam.currentIndex++;
+                renderTimedQuestion();
+            }
+        }
+        
+        function submitExam() {
+            clearInterval(AppState.timedExam.timer);
+            
+            const exam = AppState.timedExam;
+            let correct = 0;
+            const wrongQuestions = [];
+            
+            exam.questions.forEach(q => {
+                const userAnswer = exam.answers[q.id];
+                if (userAnswer === q.answer) {
+                    correct++;
+                } else {
+                    wrongQuestions.push({
+                        ...q,
+                        userAnswer,
+                        wrongTime: Date.now()
+                    });
+                }
+            });
+            
+            const score = Math.round(correct / exam.questions.length * 100);
+            const passed = score >= 85;
+            
+            // 保存统计
+            const stats = Storage.get('stats') || { total: 0, correct: 0, exams: 0 };
+            stats.total += exam.questions.length;
+            stats.correct += correct;
+            stats.exams++;
+            Storage.set('stats', stats);
+            
+            // 保存错题
+            const savedWrong = Storage.get('wrongQuestions') || [];
+            wrongQuestions.forEach(wq => {
+                if (!savedWrong.find(q => q.id === wq.id)) {
+                    savedWrong.push(wq);
+                }
+            });
+            Storage.set('wrongQuestions', savedWrong);
+            
+            // 保存考试记录
+            const history = Storage.get('examHistory') || [];
+            history.unshift({
+                date: Date.now(),
+                score,
+                correct,
+                total: exam.questions.length,
+                passed,
+                mode: 'timed'
+            });
+            Storage.set('examHistory', history);
+            
+            // 显示结果
+            showExamResult(score, passed, correct, exam.questions.length);
+        }
+        
+        function showExamResult(score, passed, correct, total) {
+            document.getElementById('resultScore').textContent = score;
+            document.getElementById('resultScore').className = 'result-score ' + (passed ? 'pass' : 'fail');
+            document.getElementById('resultMessage').textContent = passed 
+                ? '恭喜通过！' 
+                : '未达到85%通过线，继续加油！';
+            document.getElementById('resultDetails').innerHTML = `
+                <p>答对 ${correct} 题，共 ${total} 题</p>
+            `;
+            showPage('resultPage');
+        }
+        
+        function confirmExit() {
+            document.getElementById('exitModal').classList.add('active');
+        }
+        
+        function exitExam() {
+            clearInterval(AppState.timedExam.timer);
+            closeModal('exitModal');
+            showPage('homePage');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        // ==================== 自由考试 ====================
+        function startFreeExam() {
+            // 检查题库
+            if (!AppState.questions || AppState.questions.length === 0) {
+                showToast('题库未加载，请刷新页面重试');
+                console.error('题库为空，无法开始考试');
+                return;
+            }
+            
+            showPage('freeExamPage');
+            nextFreeQuestion();
+        }
+        
+        function nextFreeQuestion() {
+            const index = Math.floor(Math.random() * AppState.questions.length);
+            AppState.freeExam.currentQuestion = AppState.questions[index];
+            AppState.freeExam.answered = false;
+            
+            document.getElementById('freeNextBtn').style.display = 'none';
+            renderFreeQuestion();
+        }
+        
+        function renderFreeQuestion() {
+            const question = AppState.freeExam.currentQuestion;
+            const container = document.getElementById('freeQuestionContainer');
+            
+            container.innerHTML = `
+                <div class="question-card">
+                    <div class="question-content">${question.content}</div>
+                    <div class="options-list" id="freeOptions">
+                        ${Object.entries(question.options).map(([key, value]) => `
+                            <div class="option-item" onclick="selectFreeAnswer('${key}')">
+                                <span class="option-label">${key}</span>
+                                <span class="option-text">${value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="question-meta">
+                        <span>知识点：${question.knowledge || '无'}</span>
+                        <button class="favorite-btn ${isFavorite(question.id) ? 'active' : ''}" 
+                                onclick="toggleFavorite('${question.id}')">
+                            ${isFavorite(question.id) ? '★' : '☆'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function selectFreeAnswer(answer) {
+            if (AppState.freeExam.answered) return;
+            
+            const question = AppState.freeExam.currentQuestion;
+            const isCorrect = answer === question.answer;
+            AppState.freeExam.answered = true;
+            
+            // 更新统计
+            const stats = Storage.get('stats') || { total: 0, correct: 0, exams: 0 };
+            stats.total++;
+            if (isCorrect) stats.correct++;
+            Storage.set('stats', stats);
+            
+            // 显示结果
+            const options = document.querySelectorAll('#freeOptions .option-item');
+            options.forEach(opt => {
+                const label = opt.querySelector('.option-label').textContent;
+                if (label === question.answer) {
+                    opt.classList.add('correct');
+                } else if (label === answer && !isCorrect) {
+                    opt.classList.add('wrong');
+                }
+            });
+            
+            // 保存错题
+            if (!isCorrect) {
+                const wrongQuestions = Storage.get('wrongQuestions') || [];
+                if (!wrongQuestions.find(q => q.id === question.id)) {
+                    wrongQuestions.push({
+                        ...question,
+                        userAnswer: answer,
+                        wrongTime: Date.now()
+                    });
+                    Storage.set('wrongQuestions', wrongQuestions);
+                }
+            }
+            
+            document.getElementById('freeNextBtn').style.display = 'inline-block';
+        }
+        
+        // ==================== 错题集 ====================
+        function showWrongQuestions() {
+            showPage('wrongQuestionsPage');
+            renderWrongQuestions();
+        }
+        
+        function renderWrongQuestions(filter = null) {
+            let wrongQuestions = Storage.get('wrongQuestions') || [];
+            
+            if (filter) {
+                wrongQuestions = wrongQuestions.filter(q => 
+                    q.knowledge && q.knowledge.includes(filter)
+                );
+            }
+            
+            // 渲染知识点筛选
+            const knowledgeSet = new Set();
+            wrongQuestions.forEach(q => {
+                if (q.knowledge) {
+                    const parts = q.knowledge.split('/');
+                    parts.forEach(p => knowledgeSet.add(p.trim()));
+                }
+            });
+            
+            document.getElementById('knowledgeFilter').innerHTML = `
+                <span class="filter-tag ${!filter ? 'active' : ''}" onclick="renderWrongQuestions()">全部</span>
+                ${[...knowledgeSet].map(k => `
+                    <span class="filter-tag ${filter === k ? 'active' : ''}" 
+                          onclick="renderWrongQuestions('${k}')">${k}</span>
+                `).join('')}
+            `;
+            
+            const container = document.getElementById('wrongQuestionsList');
+            
+            if (wrongQuestions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎉</div>
+                        <p>太棒了！没有错题</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = wrongQuestions.map((q, index) => `
+                <div class="wrong-item">
+                    <div class="wrong-item-header">
+                        <span class="question-number">错题 ${index + 1}</span>
+                        <div class="wrong-item-actions">
+                            <button class="btn btn-small btn-secondary" onclick="toggleFavorite('${q.id}')">
+                                ${isFavorite(q.id) ? '取消收藏' : '收藏'}
+                            </button>
+                            <button class="btn btn-small btn-primary" onclick="markAsMastered('${q.id}')">
+                                已掌握
+                            </button>
+                        </div>
+                    </div>
+                    <div class="question-content">${q.content}</div>
+                    <div class="options-list">
+                        ${Object.entries(q.options).map(([key, value]) => `
+                            <div class="option-item ${key === q.answer ? 'correct' : ''} ${key === q.userAnswer && key !== q.answer ? 'wrong' : ''}">
+                                <span class="option-label">${key}</span>
+                                <span class="option-text">${value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="question-meta">
+                        正确答案：${q.answer} | 你的答案：${q.userAnswer}
+                    </div>
+                    <div class="question-meta">
+                        知识点：${q.knowledge || '无'}
+                    </div>
+                    <div id="aiAnalysis-${q.id}">
+                        <button class="btn btn-small btn-secondary" onclick="getAIAnalysis('${q.id}')" style="margin-top: 12px;">
+                            获取AI解析
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function markAsMastered(questionId) {
+            let wrongQuestions = Storage.get('wrongQuestions') || [];
+            wrongQuestions = wrongQuestions.filter(q => q.id !== questionId);
+            Storage.set('wrongQuestions', wrongQuestions);
+            showToast('已移出错题集');
+            renderWrongQuestions();
+        }
+        
+        async function getAIAnalysis(questionId) {
+            const container = document.getElementById(`aiAnalysis-${questionId}`);
+            container.innerHTML = `
+                <div class="ai-analysis">
+                    <div class="ai-analysis-title">
+                        <span class="loading"></span>
+                        AI正在分析...
+                    </div>
+                </div>
+            `;
+            
+            const wrongQuestions = Storage.get('wrongQuestions') || [];
+            const question = wrongQuestions.find(q => q.id === questionId);
+            
+            if (!question) {
+                container.innerHTML = '<p>题目不存在</p>';
+                return;
+            }
+            
+            // 调用百度文心一言API
+            try {
+                const analysis = await callBaiduAI(question);
+                container.innerHTML = `
+                    <div class="ai-analysis">
+                        <div class="ai-analysis-title">🤖 AI解析</div>
+                        <div class="ai-analysis-content">${analysis}</div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('AI解析失败:', error);
+                // 如果API调用失败，使用模拟解析
+                const analysis = generateMockAnalysis(question);
+                container.innerHTML = `
+                    <div class="ai-analysis">
+                        <div class="ai-analysis-title">🤖 AI解析（本地生成）</div>
+                        <div class="ai-analysis-content">${analysis}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        async function callBaiduAI(question) {
+            // 百度千帆API配置
+            const API_KEY = 'bce-v3/ALTAK-uxwRHNq3jIUSktdmIKRy4/a85dc506ff310149ad4111f48f7c5b4038ca6c44';
+            const API_URL = 'https://qianfan.baidubce.com/v2/app/conversation/runs';
+            
+            const prompt = `你是一位专业的证券从业资格考试辅导老师。请为以下错题提供详细的解析和记忆技巧。
+
+题目：${question.content}
+
+选项：
+A. ${question.options.A}
+B. ${question.options.B}
+C. ${question.options.C}
+D. ${question.options.D}
+
+正确答案：${question.answer}
+知识点：${question.knowledge || '无'}
+
+请提供：
+1. 题目解析（解释为什么正确答案是${question.answer}）
+2. 易错点分析（分析其他选项为什么错误）
+3. 记忆技巧（帮助记忆的口诀或方法）
+
+请用简洁清晰的语言回答，适合考试复习使用。`;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        app_id: 'default',
+                        query: prompt,
+                        stream: false,
+                        conversation_id: '',
+                        tools: []
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API请求失败: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // 解析返回结果
+                if (data.answer || data.response || data.result) {
+                    const answer = data.answer || data.response || data.result;
+                    return formatAIResponse(answer);
+                } else {
+                    throw new Error('API返回格式异常');
+                }
+            } catch (error) {
+                console.error('百度AI调用失败:', error);
+                throw error;
+            }
+        }
+        
+        function formatAIResponse(text) {
+            // 将AI返回的文本格式化为HTML
+            return text
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                .replace(/(\d+\.[^\d])/g, '<strong>$1</strong>')
+                .replace(/【(.+?)】/g, '<strong>【$1】</strong>');
+        }
+        
+        function generateMockAnalysis(question) {
+            return `
+                <p><strong>题目解析：</strong></p>
+                <p>这道题考查的是${question.knowledge || '相关知识点'}。</p>
+                <p><strong>正确答案：${question.answer}</strong></p>
+                <p>${question.options[question.answer]}</p>
+                <p><strong>记忆技巧：</strong></p>
+                <p>记住关键词"${question.options[question.answer].substring(0, 10)}..."，这是解题的关键。</p>
+            `;
+        }
+        
+        // ==================== 收藏夹 ====================
+        function showFavorites() {
+            showPage('favoritesPage');
+            renderFavorites();
+        }
+        
+        function isFavorite(questionId) {
+            const favorites = Storage.get('favorites') || [];
+            return favorites.includes(questionId);
+        }
+        
+        function toggleFavorite(questionId) {
+            let favorites = Storage.get('favorites') || [];
+            if (favorites.includes(questionId)) {
+                favorites = favorites.filter(id => id !== questionId);
+                showToast('已取消收藏');
+            } else {
+                favorites.push(questionId);
+                showToast('已收藏');
+            }
+            Storage.set('favorites', favorites);
+        }
+        
+        function renderFavorites() {
+            const favorites = Storage.get('favorites') || [];
+            const container = document.getElementById('favoritesList');
+            
+            if (favorites.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⭐</div>
+                        <p>还没有收藏题目</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const questions = AppState.questions.filter(q => favorites.includes(q.id));
+            
+            container.innerHTML = questions.map((q, index) => `
+                <div class="wrong-item">
+                    <div class="wrong-item-header">
+                        <span class="question-number">收藏 ${index + 1}</span>
+                        <button class="btn btn-small btn-secondary" onclick="removeFavorite('${q.id}')">
+                            取消收藏
+                        </button>
+                    </div>
+                    <div class="question-content">${q.content}</div>
+                    <div class="options-list">
+                        ${Object.entries(q.options).map(([key, value]) => `
+                            <div class="option-item">
+                                <span class="option-label">${key}</span>
+                                <span class="option-text">${value}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="question-meta">
+                        正确答案：${q.answer} | 知识点：${q.knowledge || '无'}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function removeFavorite(questionId) {
+            let favorites = Storage.get('favorites') || [];
+            favorites = favorites.filter(id => id !== questionId);
+            Storage.set('favorites', favorites);
+            showToast('已取消收藏');
+            renderFavorites();
+        }
+        
+        // ==================== 学习统计 ====================
+        function showStats() {
+            showPage('statsPage');
+            updateStatsPage();
+        }
+        
+        function updateStatsPage() {
+            const stats = Storage.get('stats') || { total: 0, correct: 0, exams: 0 };
+            const history = Storage.get('examHistory') || [];
+            
+            document.getElementById('statsTotal').textContent = stats.total;
+            document.getElementById('statsCorrect').textContent = stats.total > 0 
+                ? Math.round(stats.correct / stats.total * 100) + '%' 
+                : '0%';
+            document.getElementById('statsExams').textContent = stats.exams;
+            
+            const passedExams = history.filter(h => h.passed).length;
+            document.getElementById('statsPassRate').textContent = history.length > 0 
+                ? Math.round(passedExams / history.length * 100) + '%' 
+                : '0%';
+            
+            // 渲染趋势图（简化版）
+            renderTrendChart(history);
+            
+            // 渲染历史记录
+            renderHistory(history);
+        }
+        
+        function renderTrendChart(history) {
+            const container = document.getElementById('trendChart');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p>暂无数据</p>';
+                return;
+            }
+            
+            const recentHistory = history.slice(0, 10).reverse();
+            const maxScore = 100;
+            
+            container.innerHTML = `
+                <div style="display: flex; align-items: flex-end; height: 180px; gap: 8px; padding: 10px;">
+                    ${recentHistory.map(h => {
+                        const height = (h.score / maxScore) * 150;
+                        return `
+                            <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
+                                <div style="width: 100%; height: ${height}px; background: ${h.passed ? 'var(--success-color)' : 'var(--error-color)'}; border-radius: 4px 4px 0 0;"></div>
+                                <div style="font-size: 10px; margin-top: 4px;">${h.score}%</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        function renderHistory(history) {
+            const container = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>暂无考试记录</p></div>';
+                return;
+            }
+            
+            container.innerHTML = history.slice(0, 20).map(h => `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div>${h.mode === 'timed' ? '计时考试' : '自由练习'}</div>
+                        <div class="history-date">${new Date(h.date).toLocaleString()}</div>
+                    </div>
+                    <div class="history-score" style="color: ${h.passed ? 'var(--success-color)' : 'var(--error-color)'}">
+                        ${h.score}%
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // ==================== 数据管理 ====================
+        function showDataManage() {
+            showPage('dataManagePage');
+            updateDataManageStats();
+            updateCloudStatus();
+        }
+        
+        function updateCloudStatus() {
+            const statusEl = document.getElementById('cloudStatus');
+            if (supabase) {
+                statusEl.textContent = '已连接';
+                statusEl.style.color = 'var(--success-color)';
+            } else {
+                statusEl.textContent = '未连接';
+                statusEl.style.color = 'var(--error-color)';
+            }
+        }
+        
+        async function manualSync() {
+            if (!supabase) {
+                showToast('云端服务未连接');
+                return;
+            }
+            
+            showToast('正在同步...');
+            
+            // 同步所有数据到云端
+            const keys = ['stats', 'wrongQuestions', 'favorites', 'examHistory'];
+            for (const key of keys) {
+                const value = Storage.get(key);
+                if (value) {
+                    await Storage.syncToCloud(key, value);
+                }
+            }
+            
+            showToast('同步完成');
+        }
+        
+        function updateDataManageStats() {
+            const stats = Storage.get('stats') || { total: 0, correct: 0, exams: 0 };
+            const wrongQuestions = Storage.get('wrongQuestions') || [];
+            const favorites = Storage.get('favorites') || [];
+            const history = Storage.get('examHistory') || [];
+            
+            document.getElementById('dataStats').textContent = 
+                `${stats.total}题 / 正确率${stats.total > 0 ? Math.round(stats.correct / stats.total * 100) : 0}%`;
+            document.getElementById('dataWrong').textContent = wrongQuestions.length + '题';
+            document.getElementById('dataFavorites').textContent = favorites.length + '题';
+            document.getElementById('dataHistory').textContent = history.length + '次';
+        }
+        
+        function exportData() {
+            const data = {
+                version: '1.0',
+                exportTime: new Date().toISOString(),
+                username: AppState.currentUser?.username,
+                stats: Storage.get('stats'),
+                wrongQuestions: Storage.get('wrongQuestions'),
+                favorites: Storage.get('favorites'),
+                examHistory: Storage.get('examHistory')
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `考试复习数据_${new Date().toLocaleDateString().replace(/\//g, '-')}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast('数据已导出，请保存到网盘');
+        }
+        
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (!data.version) {
+                        showToast('无效的数据文件');
+                        return;
+                    }
+                    
+                    if (confirm('导入将覆盖当前数据，确定继续吗？')) {
+                        if (data.stats) Storage.set('stats', data.stats);
+                        if (data.wrongQuestions) Storage.set('wrongQuestions', data.wrongQuestions);
+                        if (data.favorites) Storage.set('favorites', data.favorites);
+                        if (data.examHistory) Storage.set('examHistory', data.examHistory);
+                        
+                        showToast('数据导入成功');
+                        updateDataManageStats();
+                        updateHomeStats();
+                    }
+                } catch (err) {
+                    showToast('数据文件格式错误');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // 重置input
+        }
+        
+        function confirmClearData() {
+            if (confirm('确定要清除所有数据吗？此操作不可恢复！')) {
+                const keys = ['stats', 'wrongQuestions', 'favorites', 'examHistory'];
+                keys.forEach(key => {
+                    localStorage.removeItem(Storage.getKey(key));
+                });
+                showToast('数据已清除');
+                updateDataManageStats();
+                updateHomeStats();
+            }
+        }
+        
+        // ==================== 工具函数 ====================
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        // ==================== 初始化 ====================
+        function init() {
+            console.log('应用初始化开始...');
+            
+            // 设置固定用户名
+            AppState.currentUser = { username: 'user' };
+            console.log('用户设置完成:', AppState.currentUser.username);
+            
+            // 加载题库
+            if (typeof QuestionData !== 'undefined') {
+                AppState.questions = QuestionData.questions || [];
+                AppState.knowledgePoints = QuestionData.knowledgePoints || [];
+                console.log(`题库加载成功：${AppState.questions.length} 题`);
+            } else {
+                console.error('题库数据未加载！请检查questions.js文件是否存在');
+                alert('题库加载失败，请刷新页面重试');
+                return;
+            }
+            
+            // 更新首页统计
+            updateHomeStats();
+            console.log('首页统计更新完成');
+            
+            // 从云端同步数据（异步，不阻塞）
+            if (supabase) {
+                Storage.syncFromCloud().then(() => {
+                    updateHomeStats();
+                    console.log('云端数据同步完成');
+                }).catch(err => {
+                    console.warn('云端同步失败，使用本地数据:', err);
+                });
+            }
+            
+            console.log('应用初始化完成！');
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // 备用初始化（如果DOMContentLoaded已经触发）
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(init, 100);
+        }
+    </script>
+</body>
+</html>

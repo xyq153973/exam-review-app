@@ -1021,11 +1021,11 @@
         const SUPABASE_URL = 'https://balbwhvwhdfbuwasbyyp.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_WgxSTzP7iDrM5Eg-t6MJ2Q_rLCWz..';
         
-        // 初始化Supabase客户端
-        let supabase = null;
+        // 初始化Supabase客户端（使用不同变量名避免与SDK全局变量冲突）
+        let supabaseClient = null;
         try {
             if (window.supabase) {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                 console.log('Supabase初始化成功');
             } else {
                 console.warn('Supabase SDK未加载，云端同步功能不可用');
@@ -1085,10 +1085,10 @@
             
             // 同步数据到云端
             async syncToCloud(key, value) {
-                if (!supabase || !AppState.currentUser) return;
+                if (!supabaseClient || !AppState.currentUser) return;
                 
                 try {
-                    const { error } = await supabase
+                    const { error } = await supabaseClient
                         .from('user_data')
                         .upsert({
                             username: AppState.currentUser.username,
@@ -1111,10 +1111,10 @@
             
             // 从云端获取数据
             async syncFromCloud() {
-                if (!supabase || !AppState.currentUser) return;
+                if (!supabaseClient || !AppState.currentUser) return;
                 
                 try {
-                    const { data, error } = await supabase
+                    const { data, error } = await supabaseClient
                         .from('user_data')
                         .select('*')
                         .eq('username', AppState.currentUser.username);
@@ -1808,7 +1808,7 @@ D. ${question.options.D}
         
         function updateCloudStatus() {
             const statusEl = document.getElementById('cloudStatus');
-            if (supabase) {
+            if (supabaseClient) {
                 statusEl.textContent = '已连接';
                 statusEl.style.color = 'var(--success-color)';
             } else {
@@ -1818,7 +1818,7 @@ D. ${question.options.D}
         }
         
         async function manualSync() {
-            if (!supabase) {
+            if (!supabaseClient) {
                 showToast('云端服务未连接');
                 return;
             }
@@ -1951,7 +1951,7 @@ D. ${question.options.D}
             console.log('首页统计更新完成');
             
             // 从云端同步数据（异步，不阻塞）
-            if (supabase) {
+            if (supabaseClient) {
                 Storage.syncFromCloud().then(() => {
                     updateHomeStats();
                     console.log('云端数据同步完成');
